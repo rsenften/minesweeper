@@ -14,43 +14,47 @@ import java.util.Random;
 public class GUI extends JFrame {
 
     // Size in pixels of an indiwidual square used on our board
-    private final int squareSize = 40;
+    private final int SQUARE_SIZE = 40;
 
     // Space in pixels bettween squares drawn on the board
-    private final int spacing = 8;
+    private final int SPACING = 1;
 
     // Startposition (upper left corner) of the board
-    private final int xOffset = 0, yOffset = 22;
+    private final int X_OFFSET = 0, Y_OFFSET = 22;
 
     // Number of squares to be drawn on the board
-    private final int numberOfSquares;
+    private final int GRID_SIZE;
 
     // Current position of the mouse pointer
-    private double currentX, currentY;
+    private double mousePositionX, mousePositionY;
 
     // Arrays to be used with the game
     private int[][] mines;
-//    private int[][] neighbours;
-//    private int[][] revealed;
-//    private int[][] flagged;
+    private int[][] neighbours;
+    private boolean[][] revealed;
+    private boolean[][] flagged;
+
+    // Will be used for redrawing the GUI component.
+    private static GUI gui;
 
     public GUI(int squares) {
 
-        numberOfSquares = squares;
+        GRID_SIZE = squares;
 
-        initArrays(numberOfSquares);
+        initArrays();
         initGUI();
+
+        gui = this;
     }
 
     /**
      * Initialize GUI with all its visible components.
-     *
      */
     private void initGUI() {
-        int width = xOffset +
-                (numberOfSquares * squareSize) + spacing;
-        int height = yOffset +
-                (numberOfSquares * squareSize) + spacing;
+        int width = X_OFFSET +
+                (GRID_SIZE * SQUARE_SIZE) + SPACING;
+        int height = Y_OFFSET +
+                (GRID_SIZE * SQUARE_SIZE) + SPACING;
 
         this.setTitle("Minesweeper");
         this.setSize(width, height);
@@ -69,28 +73,70 @@ public class GUI extends JFrame {
     /**
      * Initialize all internal arrays used during the game. The size
      * of the board (individual squares) is size x size.
-     *
-     * @param size Number of square on each side
      */
-    private void initArrays(int size) {
-        mines = new int[size][size];
-//        neighbours = new int[numberOfSquares][numberOfSquares];
-//        revealed = new int[numberOfSquares][numberOfSquares];
-//        flagged = new int[numberOfSquares][numberOfSquares];
+    private void initArrays() {
+
+        mines = new int[GRID_SIZE][GRID_SIZE];
+        neighbours = new int[this.GRID_SIZE][this.GRID_SIZE];
+        revealed = new boolean[this.GRID_SIZE][this.GRID_SIZE];
 
         // Random number generator
         Random random = new Random();
 
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int row = 0; row < GRID_SIZE; row++) {
+            for (int col = 0; col < GRID_SIZE; col++) {
+
                 // Approximately 20% of all squares are mines
                 if (random.nextInt(100) < 20) {
-                    mines[i][j] = 1;
+                    mines[row][col] = 1;
                 } else {
-                    mines[i][j] = 0;
+                    mines[row][col] = 0;
                 }
+                revealed[row][col] = false;
+
             }
         }
+
+        for (int row = 0; row < GRID_SIZE; row++) {
+
+            // Rows considered above and below the current row
+            int above, below;
+
+            // Columns considered left and right of the current column
+            int left, right;
+
+            above = row - 1;
+            below = row + 1;
+
+            for (int col = 0; col < GRID_SIZE; col++) {
+
+                left = col - 1;
+                right = col + 1;
+
+                // Number of mine cells in the 8 neighboring cells
+                int countMines = 0;
+                countMines += numberOfMines(above, left);
+                countMines += numberOfMines(above, col);
+                countMines += numberOfMines(above, right);
+                countMines += numberOfMines(row, left);
+                countMines += numberOfMines(row, right);
+                countMines += numberOfMines(below, left);
+                countMines += numberOfMines(below, col);
+                countMines += numberOfMines(below, right);
+
+                neighbours[row][col] = countMines;
+            }
+        }
+
+    }
+
+    /**
+     * Returns the number of mines in the given cell
+     */
+    private int numberOfMines(int row, int col) {
+        return (row >= 0 && col >= 0 &&
+                row < GRID_SIZE && col < GRID_SIZE &&
+                mines[row][col] == 1) ? 1 : 0;
     }
 
     /**
@@ -111,29 +157,42 @@ public class GUI extends JFrame {
             graphics.fillRect(0, 0, width, height);
 
 
-            for (int i = 0; i < numberOfSquares; i++) {
-                for (int j = 0; j < numberOfSquares; j++) {
-                    int xPosition = (i * squareSize) + spacing;
-                    int yPosition = (j * squareSize) + spacing;
+            for (int row = 0; row < GRID_SIZE; row++) {
+                for (int col = 0; col < GRID_SIZE; col++) {
+
+                    int y = (row * SQUARE_SIZE) + SPACING;
+                    int x = (col * SQUARE_SIZE) + SPACING;
 
                     // Initial color of all squares
                     graphics.setColor(Color.LIGHT_GRAY);
 
                     // Mark all mines
-                    if (mines[i][j] == 1) {
+                    if (mines[row][col] == 1) {
                         graphics.setColor(Color.YELLOW);
                     }
 
-                    // Mark the squares during our mouse movements
-                    if (mouseInSquare(i, xPosition, yPosition)) {
+                    // Show revealed fields
+                    if (revealed[row][col]) {
+                        graphics.setColor(Color.WHITE);
+                    }
+
+                    // Show the square as we move around
+                    if (row == getSquareY() && col == getSquareX()) {
                         graphics.setColor(Color.RED);
                     }
 
-                    graphics.fillRect(
-                            xPosition,
-                            yPosition ,
-                            squareSize - spacing,
-                            squareSize - spacing);
+                    graphics.fillRect(x, y,
+                            SQUARE_SIZE - SPACING, SQUARE_SIZE - SPACING);
+
+                    // Show number of mines
+                    if (revealed[row][col]) {
+                        graphics.setColor(Color.BLACK);
+                        graphics.setFont(new Font("Arial", Font.BOLD, 20));
+                        graphics.drawString("" + neighbours[row][col],
+                                x + SQUARE_SIZE / 2 - 5,
+                                y + SQUARE_SIZE / 2 + 5);
+                    }
+
                 }
             }
         }
@@ -141,52 +200,29 @@ public class GUI extends JFrame {
 
     }
 
-    /**
-     * Returns true, if mouse pointer is in current square.
-     *
-     */
-    private boolean mouseInSquare(int i, int xPosition, int yPosition) {
-        return currentX >= xOffset + xPosition &&
-                currentX < xOffset + (i * squareSize) + squareSize &&
-                currentY >= yOffset + yPosition &&
-                currentY < yOffset + yPosition + squareSize - spacing;
+    private int getSquareX() {
+        return (int) ((mousePositionX - X_OFFSET) / SQUARE_SIZE);
     }
 
-    /**
-     * Retrieve the X/Y coordinates of the current (mouse over) square.
-     *
-     */
-    private int[] getCoordinatesOfSquare() {
-        for (int i = 0; i < numberOfSquares; i++) {
-            for (int j = 0; j < numberOfSquares; j++) {
-                int xPosition = (i * squareSize) + spacing;
-                int yPosition = (j * squareSize) + spacing;
-
-
-                if (mouseInSquare(i, xPosition, yPosition)) {
-                    return new int[]{i, j};
-                }
-
-            }
-        }
-        return new int[]{-1, -1};
+    private int getSquareY() {
+        return (int) ((mousePositionY - Y_OFFSET) / SQUARE_SIZE);
     }
-
 
     /**
      * Callback methods for every mouse motion on our board.
      */
     private class Move implements MouseMotionListener {
+
         @Override
         public void mouseDragged(MouseEvent e) {
-            // TODO Replace auto generated code
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            currentX = e.getPoint().getX();
-            currentY = e.getPoint().getY();
-            // System.out.println("Moved: [X=" + currentX + ", Y=" + currentY + "]");
+            mousePositionX = e.getPoint().getX();
+            mousePositionY = e.getPoint().getY();
+            //System.out.println("Moved: [X=" + mousePositionX + ", Y=" + mousePositionY + "]");
+            gui.repaint();
         }
     }
 
@@ -197,27 +233,36 @@ public class GUI extends JFrame {
     private class Click implements MouseListener {
         @Override
         public void mouseClicked(MouseEvent e) {
-            System.out.println("Clicked: [" + getCoordinatesOfSquare()[0] + "," + getCoordinatesOfSquare()[1] + "]");
+
+            int row = getSquareY();
+            int col = getSquareX();
+
+            revealed[row][col] = true;
+            System.out.println("Clicked: [" +
+                    row + "," +
+                    col + "], Neighbours: " + neighbours[row][col]);
+            
+            if (mines[row][col] == 1)
+                System.exit(0);
+
+            gui.repaint();
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-            // TODO Replace auto generated code
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            // TODO Replace auto generated code
         }
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            // TODO Replace auto generated code
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            // TODO Replace auto generated code
         }
     }
+
 }
