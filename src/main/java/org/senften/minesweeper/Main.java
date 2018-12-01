@@ -4,9 +4,7 @@ package org.senften.minesweeper;
  * User: Daniel Senften <daniel@senften.org>
  * Date: 27.11.18, 11:25
  */
-public class Main implements Runnable {
-
-    private static GUI gui;
+public class Main  {
 
     public static void main(String[] args) {
 
@@ -16,14 +14,7 @@ public class Main implements Runnable {
             size = Integer.parseInt(args[0]);
         } catch (Exception ignored) {}
 
-        gui = new GUI(size);
-        new Thread(new Main()).start();
+        new GUI(size);
     }
 
-    public void run() {
-        //noinspection InfiniteLoopStatement
-        while (true) {
-            gui.repaint();
-        }
-    }
 }
