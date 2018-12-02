@@ -131,6 +131,58 @@ public class GUI extends JFrame {
     }
 
     /**
+     * Reveal all cells around a zero mine cell.
+     */
+    private void revealZeroMineCells(int row, int col) {
+
+        int above = row - 1;
+        int below = row + 1;
+
+        int left = col - 1;
+        int right = col + 1;
+
+        if (zeroNeighbours(row, col)) {
+
+            revealed[row][col] = true;
+
+            if (cellInBoard(above, left))
+                revealed[above][left] = true;
+
+            if (cellInBoard(above, col))
+                revealed[above][col] = true;
+
+            if (cellInBoard(above, right))
+                revealed[above][right] = true;
+
+            if (cellInBoard(row, left))
+                revealed[row][left] = true;
+
+            if (cellInBoard(row, right))
+                revealed[row][right] = true;
+
+            if (cellInBoard(below, left))
+                revealed[below][left] = true;
+
+            if (cellInBoard(below, col))
+                revealed[below][col] = true;
+
+            if (cellInBoard(below, right))
+                revealed[below][right] = true;
+        }
+    }
+
+    private boolean cellInBoard(int row, int col) {
+        return row >= 0 && col >= 0 &&
+                row < GRID_SIZE && col < GRID_SIZE;
+    }
+
+    private boolean zeroNeighbours(int row, int col) {
+        return row >= 0 && col >= 0 &&
+                row < GRID_SIZE && col < GRID_SIZE &&
+                neighbours[row][col] == 0;
+    }
+
+    /**
      * Returns the number of mines in the given cell
      */
     private int numberOfMines(int row, int col) {
@@ -238,10 +290,12 @@ public class GUI extends JFrame {
             int col = getSquareX();
 
             revealed[row][col] = true;
+            if (neighbours[row][col] == 0) revealZeroMineCells(row, col);
+
             System.out.println("Clicked: [" +
                     row + "," +
                     col + "], Neighbours: " + neighbours[row][col]);
-            
+
             if (mines[row][col] == 1)
                 System.exit(0);
 
