@@ -32,7 +32,6 @@ public class GUI extends JFrame {
     private int[][] mines;
     private int[][] neighbours;
     private boolean[][] revealed;
-    private boolean[][] flagged;
 
     // Will be used for redrawing the GUI component.
     private static GUI gui;
@@ -115,6 +114,7 @@ public class GUI extends JFrame {
 
                 // Number of mine cells in the 8 neighboring cells
                 int countMines = 0;
+
                 countMines += numberOfMines(above, left);
                 countMines += numberOfMines(above, col);
                 countMines += numberOfMines(above, right);
@@ -141,44 +141,47 @@ public class GUI extends JFrame {
         int left = col - 1;
         int right = col + 1;
 
+        revealed[row][col] = true;
+
         if (zeroNeighbours(row, col)) {
 
-            revealed[row][col] = true;
-
-            if (cellInBoard(above, left))
-                revealed[above][left] = true;
-
-            if (cellInBoard(above, col))
-                revealed[above][col] = true;
-
-            if (cellInBoard(above, right))
-                revealed[above][right] = true;
-
-            if (cellInBoard(row, left))
-                revealed[row][left] = true;
-
-            if (cellInBoard(row, right))
-                revealed[row][right] = true;
-
-            if (cellInBoard(below, left))
-                revealed[below][left] = true;
-
-            if (cellInBoard(below, col))
-                revealed[below][col] = true;
-
-            if (cellInBoard(below, right))
-                revealed[below][right] = true;
+            markZeroCells(above, left);
+            markZeroCells(above, col);
+            markZeroCells(above, right);
+            markZeroCells(row, left);
+            markZeroCells(row, right);
+            markZeroCells(below, left);
+            markZeroCells(below, col);
+            markZeroCells(below, right);
         }
     }
 
+    /**
+     * Solange sich die Zelle innerhalb unseres Spielfeldes befindet
+     * und noch nocht verarbeitet wurde rufen wir die Funktion
+     * revealZeroMineCells() zur effektiven Verarbeitung der Zelle
+     * auf.
+     */
+    private void markZeroCells(int row, int col) {
+        if (cellInBoard(row, col) && !revealed[row][col])
+            revealZeroMineCells(row, col);
+    }
+
+    /**
+     * Liefert den Wert TRUE, sofern sich die Zelle innerhalb unseres
+     * Spielbrettes befindet.
+     */
     private boolean cellInBoard(int row, int col) {
         return row >= 0 && col >= 0 &&
                 row < GRID_SIZE && col < GRID_SIZE;
     }
 
+    /**
+     * Liefert den Wert TRUE, sofern sich die Zelle innerhalb unseres
+     * Spielbrettes befindet UND keine Nachbarn besitzt.
+     */
     private boolean zeroNeighbours(int row, int col) {
-        return row >= 0 && col >= 0 &&
-                row < GRID_SIZE && col < GRID_SIZE &&
+        return cellInBoard(row, col) &&
                 neighbours[row][col] == 0;
     }
 
@@ -290,7 +293,8 @@ public class GUI extends JFrame {
             int col = getSquareX();
 
             revealed[row][col] = true;
-            if (neighbours[row][col] == 0) revealZeroMineCells(row, col);
+            if (neighbours[row][col] == 0)
+                revealZeroMineCells(row, col);
 
             System.out.println("Clicked: [" +
                     row + "," +
