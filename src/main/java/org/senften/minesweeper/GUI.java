@@ -8,8 +8,12 @@ import java.awt.event.MouseMotionListener;
 import java.util.Random;
 
 /**
- * User: Daniel Senften <daniel@senften.org>
- * Date: 27.11.18, 11:29
+ * Graphische Benutzerschnittstelle (GUI) des Spieles.
+ *
+ * Dieses Programm wurde erstellt durch:
+ * - Raffaele Senften
+ * - Daniel Senften
+ *
  */
 public class GUI extends JFrame {
 
@@ -47,7 +51,8 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Initialize GUI with all its visible components.
+     * Initialisierung des GUIs mit all seinen sichtbaren
+     * Komponenten.
      */
     private void initGUI() {
         int width = X_OFFSET +
@@ -70,8 +75,8 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Initialize all internal arrays used during the game. The size
-     * of the board (individual squares) is size x size.
+     * Initialisiere alle internen Arrays, die während dem
+     * Spiel verwendet werden.
      */
     @SuppressWarnings("Duplicates")
     private void initArrays() {
@@ -132,7 +137,7 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Reveal all cells around a zero mine cell.
+     * Decke alle Zellen um eine Null-Minen-Zelle herum auf.
      */
     private void revealZeroMineCells(final int row, final int col) {
 
@@ -187,7 +192,7 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Returns the number of mines in the given cell
+     * Liefert die Anzahl der Minen in der angegebenen Zelle.
      */
     private int numberOfMines(final int row, final int col) {
         return (row >= 0 && col >= 0 &&
@@ -196,8 +201,8 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Definition of our board including all fields with and without
-     * mines.
+     * Definition unseres Boards mit allen Feldern. Die Zellen werden
+     * entsprechend eingefärbt (und dargestellt).
      */
     private class Board extends JPanel {
         private final int width, height;
@@ -265,7 +270,7 @@ public class GUI extends JFrame {
     }
 
     /**
-     * Callback methods for every mouse motion on our board.
+     * Callback-Methoden für jede Mausbewegung auf unserem Board.
      */
     private class Move implements MouseMotionListener {
 
@@ -284,7 +289,7 @@ public class GUI extends JFrame {
 
 
     /**
-     * Callback methods for every mouse click on our board
+     * Rückrufmethoden für jeden Mausklick auf unserem Board.
      */
     private class Click implements MouseListener {
         @Override

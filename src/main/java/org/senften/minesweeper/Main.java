@@ -1,8 +1,7 @@
 package org.senften.minesweeper;
 
 /**
- * User: Daniel Senften <daniel@senften.org>
- * Date: 27.11.18, 11:25
+ * Hauptprogramm zum Starten des Spieles.
  */
 public class Main  {
 
