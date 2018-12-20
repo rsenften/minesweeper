@@ -73,6 +73,7 @@ public class GUI extends JFrame {
      * Initialize all internal arrays used during the game. The size
      * of the board (individual squares) is size x size.
      */
+    @SuppressWarnings("Duplicates")
     private void initArrays() {
 
         mines = new int[GRID_SIZE][GRID_SIZE];
