@@ -36,7 +36,7 @@ public class GUI extends JFrame {
     // Will be used for redrawing the GUI component.
     private static GUI gui;
 
-    public GUI(int squares) {
+    public GUI(final int squares) {
 
         GRID_SIZE = squares;
 
@@ -133,7 +133,7 @@ public class GUI extends JFrame {
     /**
      * Reveal all cells around a zero mine cell.
      */
-    private void revealZeroMineCells(int row, int col) {
+    private void revealZeroMineCells(final int row, final int col) {
 
         int above = row - 1;
         int below = row + 1;
@@ -162,7 +162,7 @@ public class GUI extends JFrame {
      * revealZeroMineCells() zur effektiven Verarbeitung der Zelle
      * auf.
      */
-    private void markZeroCells(int row, int col) {
+    private void markZeroCells(final int row, final int col) {
         if (cellInBoard(row, col) && !revealed[row][col])
             revealZeroMineCells(row, col);
     }
@@ -171,7 +171,7 @@ public class GUI extends JFrame {
      * Liefert den Wert TRUE, sofern sich die Zelle innerhalb unseres
      * Spielbrettes befindet.
      */
-    private boolean cellInBoard(int row, int col) {
+    private boolean cellInBoard(final int row, final int col) {
         return row >= 0 && col >= 0 &&
                 row < GRID_SIZE && col < GRID_SIZE;
     }
@@ -180,7 +180,7 @@ public class GUI extends JFrame {
      * Liefert den Wert TRUE, sofern sich die Zelle innerhalb unseres
      * Spielbrettes befindet UND keine Nachbarn besitzt.
      */
-    private boolean zeroNeighbours(int row, int col) {
+    private boolean zeroNeighbours(final int row, final int col) {
         return cellInBoard(row, col) &&
                 neighbours[row][col] == 0;
     }
@@ -188,7 +188,7 @@ public class GUI extends JFrame {
     /**
      * Returns the number of mines in the given cell
      */
-    private int numberOfMines(int row, int col) {
+    private int numberOfMines(final int row, final int col) {
         return (row >= 0 && col >= 0 &&
                 row < GRID_SIZE && col < GRID_SIZE &&
                 mines[row][col] == 1) ? 1 : 0;
@@ -201,7 +201,7 @@ public class GUI extends JFrame {
     private class Board extends JPanel {
         private final int width, height;
 
-        Board(int width, int height) {
+        Board(final int width, final int height) {
             this.width = width;
             this.height = height;
         }
